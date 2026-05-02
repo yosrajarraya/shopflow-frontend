@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
-import { Page, ProductRequest, ProductResponse } from '../models';
+import { HomeStats, Page, ProductRequest, ProductResponse } from '../models';
 import { environment } from '../../../environments/environment';
 
 @Injectable({ providedIn: 'root' })
@@ -26,6 +26,10 @@ export class ProductService {
 
   topVentes(): Observable<ProductResponse[]> {
     return this.http.get<ProductResponse[]>(`${this.API}/top-selling`);
+  }
+
+  statistiquesAccueil(): Observable<HomeStats> {
+    return this.http.get<HomeStats>(`${this.API}/stats`);
   }
 
   promos(page = 0, size = 12): Observable<Page<ProductResponse>> {

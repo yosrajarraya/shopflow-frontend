@@ -97,6 +97,13 @@ export interface Page<T> {
   last: boolean;
 }
 
+export interface HomeStats {
+  totalProduits: number;
+  totalVendeurs: number;
+  totalClients: number;
+  noteMoyenne: number;
+}
+
 // ─── Cart ────────────────────────────────────────────────────────────────────
 export interface CartItemResponse {
   id: number;

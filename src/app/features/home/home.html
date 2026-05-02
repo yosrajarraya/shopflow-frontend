@@ -39,19 +39,19 @@
   <div class="container">
     <div class="stats-grid">
       <div class="stat-item">
-        <span class="stat-num">10K+</span>
+        <span class="stat-num">{{ homeStats?.totalProduits ?? 0 | number:'1.0-0' }}</span>
         <span class="stat-label">Produits</span>
       </div>
       <div class="stat-item">
-        <span class="stat-num">500+</span>
+        <span class="stat-num">{{ homeStats?.totalVendeurs ?? 0 | number:'1.0-0' }}</span>
         <span class="stat-label">Vendeurs</span>
       </div>
       <div class="stat-item">
-        <span class="stat-num">50K+</span>
+        <span class="stat-num">{{ homeStats?.totalClients ?? 0 | number:'1.0-0' }}</span>
         <span class="stat-label">Clients</span>
       </div>
       <div class="stat-item">
-        <span class="stat-num">4.8★</span>
+        <span class="stat-num">{{ homeStats?.noteMoyenne ?? 0 | number:'1.1-1' }}★</span>
         <span class="stat-label">Note moyenne</span>
       </div>
     </div>
@@ -89,7 +89,7 @@
         <div class="product-img">
           <img *ngIf="p.images.length" [src]="p.images[0]" [alt]="p.nom" />
           <div *ngIf="!p.images.length" class="product-placeholder">🛍️</div>
-          <span *ngIf="p.prixPromo" class="badge-promo" style="position:absolute;top:12px;left:12px;">
+          <span *ngIf="p.prixPromo" class="badge-promo promo-badge-on-image">
             -{{ p.pourcentageRemise | number:'1.0-0' }}%
           </span>
         </div>
@@ -118,7 +118,7 @@
         <div class="promo-img">
           <img *ngIf="p.images.length" [src]="p.images[0]" [alt]="p.nom" />
           <div *ngIf="!p.images.length" class="product-placeholder" style="height:100%">🎁</div>
-          <div class="promo-badge">-{{ p.pourcentageRemise | number:'1.0-0' }}%</div>
+          <span class="badge-promo promo-badge-on-image">-{{ p.pourcentageRemise | number:'1.0-0' }}%</span>
         </div>
         <div class="promo-info">
           <p class="promo-name">{{ p.nom }}</p>

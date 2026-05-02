@@ -1,52 +1,75 @@
-<div class="container">
-  <a routerLink="/products" class="back-link">← Retour au catalogue</a>
+<div class="container detail-page">
+  <a routerLink="/products" class="back-link">Retour au catalogue</a>
 
   <app-loading-spinner *ngIf="loading"></app-loading-spinner>
 
   <div *ngIf="!loading && product" class="product-detail animate-fade">
     <div class="detail-grid">
-
-      <!-- Left: Gallery -->
-      <div class="gallery-col">
-        <div class="main-image">
-          <img *ngIf="hasImages" [src]="activeImage" [alt]="product.nom" />
-          <div *ngIf="!hasImages" class="image-placeholder">🛍️</div>
-          <span *ngIf="product.prixPromo" class="promo-badge-lg">-{{ product.pourcentageRemise | number:'1.0-0' }}%</span>
-        </div>
-
-        <div class="thumbs-row" *ngIf="hasMultipleImages">
-          <div *ngFor="let img of product!.images; let i = index"
-               class="thumb" [class.active]="i === activeImageIndex"
-               (click)="activeImageIndex = i">
-            <img [src]="img" [alt]="product.nom + ' ' + (i+1)" />
+      <section class="media-col">
+        <article class="media-card">
+          <div class="main-image">
+            <img *ngIf="hasImages" [src]="activeImage" [alt]="product.nom" />
+            <div *ngIf="!hasImages" class="image-placeholder">Produit</div>
+            <span *ngIf="product.prixPromo" class="promo-badge-lg">-{{ product.pourcentageRemise | number:'1.0-0' }}%</span>
           </div>
-        </div>
 
-        <div class="description-block">
+          <div class="thumbs-row" *ngIf="hasMultipleImages">
+            <button
+              type="button"
+              *ngFor="let img of product!.images; let i = index"
+              class="thumb"
+              [class.active]="i === activeImageIndex"
+              (click)="activeImageIndex = i"
+              [attr.aria-label]="'Image ' + (i + 1)">
+              <img [src]="img" [alt]="product.nom + ' ' + (i + 1)" />
+            </button>
+          </div>
+
+          <div class="key-stats">
+            <div class="stat-pill">
+              <strong>{{ product.nombreVentes }}</strong>
+              <span>Ventes</span>
+            </div>
+            <div class="stat-pill">
+              <strong>{{ product.stock }}</strong>
+              <span>Stock</span>
+            </div>
+            <div class="stat-pill" *ngIf="hasVariants">
+              <strong>{{ product.variantes.length }}</strong>
+              <span>Variantes</span>
+            </div>
+            <div class="stat-pill" *ngIf="!hasVariants">
+              <strong>Standard</strong>
+              <span>Version</span>
+            </div>
+          </div>
+        </article>
+
+        <article class="description-card">
           <h3>Description</h3>
           <p>{{ product.description }}</p>
-        </div>
-      </div>
-
-      <!-- Right: Purchase panel -->
-      <aside class="purchase-col">
-        <div class="info-top">
-          <div class="product-cats" *ngIf="hasCategories">
-            <span *ngFor="let cat of product!.categories; let last = last" class="cat-tag">{{ cat.nom }}<span *ngIf="!last"> · </span></span>
+          <div class="category-tags" *ngIf="hasCategories">
+            <span *ngFor="let cat of product!.categories" class="cat-chip">{{ cat.nom }}</span>
           </div>
-          <h1 class="product-title">{{ product.nom }}</h1>
-          <div class="rating-row">
-            <app-star-rating [note]="product.noteMoyenne"></app-star-rating>
-            <span class="meta-small">({{ product.avis.length || 0 }} avis) · {{ product.nombreVentes }} vendus</span>
+        </article>
+      </section>
+
+      <aside class="purchase-col">
+        <article class="purchase-card">
+          <div class="title-top">
+            <p class="product-type" *ngIf="hasCategories">{{ product.categories[0].nom }}</p>
+            <h1 class="product-title">{{ product.nom }}</h1>
+            <div class="rating-row">
+              <app-star-rating [note]="product.noteMoyenne"></app-star-rating>
+              <span class="meta-small">{{ product.avis.length || 0 }} avis</span>
+            </div>
           </div>
 
           <div class="price-block">
             <div class="price-main">{{ finalPrice | number:'1.2-2' }} TND</div>
             <div *ngIf="product.prixPromo" class="price-old">{{ product.prix | number:'1.2-2' }} TND</div>
           </div>
-        </div>
 
-        <div class="purchase-card">
           <div class="stock-row">
             <span class="stock-indicator" [class.in-stock]="product.stock > 0" [class.out-stock]="product.stock === 0">
               {{ product.stock > 0 ? 'En stock (' + product.stock + ')' : 'Rupture de stock' }}
@@ -54,9 +77,9 @@
           </div>
 
           <div class="variants-block" *ngIf="hasVariants">
-            <p class="block-label">Variantes</p>
+            <p class="block-label">Choisir une variante</p>
             <div class="variants-list">
-              <button *ngFor="let v of product!.variantes" class="variant-btn" [class.selected]="selectedVariant?.id === v.id" (click)="selectVariant(v)">
+              <button type="button" *ngFor="let v of product!.variantes" class="variant-btn" [class.selected]="selectedVariant?.id === v.id" (click)="selectVariant(v)">
                 <span>{{ v.valeur }}</span>
               </button>
             </div>
@@ -64,12 +87,12 @@
 
           <div class="cart-actions" *ngIf="product.stock > 0">
             <div class="qty-control">
-              <button class="qty-btn" (click)="adjustQty(-1)">−</button>
+              <button type="button" class="qty-btn" (click)="adjustQty(-1)">−</button>
               <span class="qty-val">{{ quantity }}</span>
-              <button class="qty-btn" (click)="adjustQty(1)">+</button>
+              <button type="button" class="qty-btn" (click)="adjustQty(1)">+</button>
             </div>
             <button class="btn btn-primary btn-lg add-cart" (click)="addToCart()" [disabled]="addingToCart">
-              {{ addingToCart ? 'Ajout...' : 'Ajouter au panier' }}
+              {{ addingToCart ? 'Ajout en cours...' : 'Ajouter au panier' }}
             </button>
           </div>
 
@@ -77,44 +100,50 @@
             <div class="seller-avatar">{{ (product.sellerNom || 'S').charAt(0) }}</div>
             <div>
               <div class="seller-name">{{ product.sellerNom }}</div>
-              <div class="seller-boutique">{{ product.sellerBoutique }}</div>
+              <div class="seller-boutique">{{ product.sellerBoutique || 'Boutique ShopFlow' }}</div>
             </div>
           </div>
-        </div>
+
+          <ul class="service-points">
+            <li>Paiement sécurisé</li>
+            <li>Support client réactif</li>
+            <li>Livraison rapide selon votre zone</li>
+          </ul>
+        </article>
 
         <div class="actions-section" *ngIf="canDeleteProduct()">
-          <button [routerLink]="['/products', product.id, 'edit']" class="btn btn-secondary btn-sm">✏️ Modifier</button>
-          <button (click)="deleteProduit()" [disabled]="deleting" class="btn btn-danger btn-sm">{{ deleting ? '⏳' : '🗑️ Supprimer' }}</button>
+          <button [routerLink]="['/products', product.id, 'edit']" class="btn btn-outline btn-sm">Modifier</button>
+          <button (click)="deleteProduit()" [disabled]="deleting" class="btn btn-danger btn-sm">{{ deleting ? 'Suppression...' : 'Supprimer' }}</button>
         </div>
       </aside>
     </div>
 
-    <!-- Reviews -->
-    <div class="reviews-section">
-      <!-- Display Reviews -->
+    <section class="reviews-section">
+      <div class="section-head">
+        <h3>Avis clients</h3>
+        <span class="meta-small">{{ product!.avis.length }} avis publiés</span>
+      </div>
+
       <div class="reviews-list" *ngIf="hasReviews">
-        <h3>Avis clients ({{ product!.avis.length }})</h3>
         <div class="reviews-grid">
-          <div *ngFor="let avis of product!.avis" class="review-card">
+          <article *ngFor="let avis of product!.avis" class="review-card">
             <div class="review-header">
               <div class="review-author">{{ avis.customerNom }}</div>
               <app-star-rating [note]="avis.note" [showLabel]="false"></app-star-rating>
-              <span class="review-date text-muted">{{ avis.dateCreation | date:'dd/MM/yyyy' }}</span>
             </div>
             <p class="review-comment">{{ avis.commentaire }}</p>
-          </div>
+            <span class="review-date text-muted">{{ avis.dateCreation | date:'dd/MM/yyyy' }}</span>
+          </article>
         </div>
       </div>
 
-      <!-- No Reviews Message -->
       <div class="no-reviews" *ngIf="!hasReviews">
-        <p>Aucun avis pour le moment. Soyez le premier à laisser un avis !</p>
+        <p>Aucun avis pour le moment. Soyez le premier à donner votre retour.</p>
       </div>
 
-      <!-- Review Submission Prompt -->
       <div class="review-prompt" *ngIf="authService.isLoggedIn() && authService.isCustomer()">
-        <p class="text-muted">💡 Vous pouvez laisser un avis après avoir acheté ce produit. Allez dans vos commandes pour évaluer ce produit.</p>
+        <p class="text-muted">Vous pourrez laisser un avis après achat depuis la section commandes.</p>
       </div>
-    </div>
+    </section>
   </div>
 </div>

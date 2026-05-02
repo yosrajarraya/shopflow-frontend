@@ -5,7 +5,7 @@ import { RouterModule } from '@angular/router';
 import { Router } from '@angular/router';
 import { ProductService } from '../../core/services/product';
 import { CategoryService } from '../../core/services/other';
-import { ProductResponse, CategoryResponse } from '../../core/models';
+import { ProductResponse, CategoryResponse, HomeStats } from '../../core/models';
 import { LoadingSpinnerComponent } from '../../shared/components/loading-spinner/loading-spinner';
 
 @Component({
@@ -19,6 +19,7 @@ export class HomeComponent implements OnInit {
   topProducts: ProductResponse[] = [];
   promoProducts: ProductResponse[] = [];
   categories: CategoryResponse[] = [];
+  homeStats: HomeStats | null = null;
   searchQuery = '';
   loading = true;
 
@@ -38,6 +39,9 @@ export class HomeComponent implements OnInit {
     });
     this.categoryService.listerCategories().subscribe({
       next: c => this.categories = c.slice(0, 8)
+    });
+    this.productService.statistiquesAccueil().subscribe({
+      next: stats => this.homeStats = stats
     });
   }
 
