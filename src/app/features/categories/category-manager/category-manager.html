@@ -1,0 +1,88 @@
+<div class="container">
+  <div class="page-header">
+    <h1>Gestion des catégories</h1>
+    <p>Créer, modifier et supprimer les catégories de produits</p>
+  </div>
+
+  <app-loading-spinner *ngIf="loading"></app-loading-spinner>
+
+  <div *ngIf="!loading" class="manager-layout">
+    <!-- Formulaire -->
+    <div class="panel">
+      <div class="panel-header flex-between">
+        <h3>{{ editMode ? 'Modifier une catégorie' : 'Nouvelle catégorie' }}</h3>
+        <button *ngIf="editMode" class="btn btn-ghost btn-sm" (click)="resetForm()">Annuler</button>
+      </div>
+
+      <form [formGroup]="form" (ngSubmit)="submit()" novalidate class="category-form">
+        <div class="form-group">
+          <label class="form-label">Nom *</label>
+          <input
+            type="text"
+            formControlName="nom"
+            class="form-control"
+            [class.is-invalid]="nom.invalid && nom.touched"
+            placeholder="Ex: Électronique" />
+          <span class="form-error" *ngIf="nom.touched && nom.hasError('required')">Nom requis</span>
+          <span class="form-error" *ngIf="nom.touched && nom.hasError('minlength')">Minimum 2 caractères</span>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Description</label>
+          <textarea
+            formControlName="description"
+            class="form-control"
+            rows="4"
+            placeholder="Description de la catégorie"></textarea>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Catégorie parent</label>
+          <select formControlName="parentId" class="form-control">
+            <option [ngValue]="null">Aucune</option>
+            <option *ngFor="let cat of categories" [ngValue]="cat.id">
+              {{ cat.nom }}
+            </option>
+          </select>
+        </div>
+
+        <button type="submit" class="btn btn-primary w-full" [disabled]="submitting">
+          {{ submitting ? 'Enregistrement...' : (editMode ? 'Modifier' : 'Créer la catégorie') }}
+        </button>
+      </form>
+    </div>
+
+    <!-- Liste -->
+    <div class="panel">
+      <div class="panel-header">
+        <h3>Liste des catégories</h3>
+      </div>
+
+      <div *ngIf="categories.length; else emptyCategories" class="categories-list">
+        <div *ngFor="let cat of categories" class="category-row">
+          <div class="category-info">
+            <div class="category-name">{{ cat.nom }}</div>
+            <div class="category-meta">
+              {{ cat.description || 'Aucune description' }}
+            </div>
+            <div class="category-parent" *ngIf="cat.parentId">
+              Parent ID: {{ cat.parentId }}
+            </div>
+          </div>
+
+          <div class="category-actions">
+            <button class="btn btn-outline btn-sm" (click)="editCategory(cat)">Modifier</button>
+            <button class="btn btn-danger btn-sm" (click)="deleteCategory(cat.id)">Supprimer</button>
+          </div>
+        </div>
+      </div>
+
+      <ng-template #emptyCategories>
+        <div class="empty-state small">
+          <span class="empty-icon">🗂️</span>
+          <p>Aucune catégorie créée.</p>
+        </div>
+      </ng-template>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,42 @@
+/* Local styles for compact seller products grid */
+
+.page-header.compact{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:18px}
+.header-actions{display:flex;align-items:center}
+
+.stats-row{display:flex;gap:12px;margin:8px 0 18px}
+.stat-card{background:linear-gradient(180deg,#fff,#fbfdff);padding:10px 14px;border-radius:10px;box-shadow:0 6px 18px rgba(16,24,40,0.04);display:flex;flex-direction:column;align-items:flex-start}
+.stat-value{font-weight:800;font-size:1.1rem}
+.stat-label{color:rgba(0,0,0,0.5);font-size:.85rem}
+
+.products-grid{display:grid;gap:20px;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));align-items:start}
+@media (min-width:1200px){.products-grid{grid-template-columns:repeat(4,1fr)}}
+
+.product-card{background:var(--card-bg,#fff);border-radius:12px;box-shadow:0 6px 18px rgba(16,24,40,0.06);overflow:hidden;display:flex;flex-direction:column;transition:transform .12s}
+.product-card:hover{transform:translateY(-4px)}
+
+.card-media{position:relative;height:160px;overflow:hidden;cursor:pointer}
+.card-media img{width:100%;height:100%;object-fit:cover;display:block}
+.stock-badge{position:absolute;right:10px;top:10px;background:#fff7ed;color:#b45309;padding:6px 8px;border-radius:12px;font-weight:700;font-size:.8rem;box-shadow:0 2px 8px rgba(16,24,40,0.06)}
+
+.card-body{padding:12px 14px;display:flex;flex-direction:column;gap:8px;flex:1}
+.product-name{font-weight:800;font-size:.95rem;margin:0;color:var(--text-primary);cursor:pointer}
+.product-category{color:var(--text-muted);font-size:.85rem;margin:0}
+
+.price-row{display:flex;align-items:center;gap:8px;margin-top:4px}
+.price{color:var(--accent-dark);font-weight:800}
+.price-original{text-decoration:line-through;color:var(--text-muted);font-size:.86rem}
+
+.meta-row{display:flex;align-items:center;gap:8px}
+
+.actions-row{margin-top:auto;display:flex;gap:8px;justify-content:space-between;align-items:center}
+.btn.btn-outline.btn-sm{padding:6px 10px}
+
+.empty-state.compact{text-align:center;padding:40px 0}
+
+.pagination.compact{display:flex;gap:12px;align-items:center;justify-content:center;margin-top:20px}
+
+.product-card.deleting{opacity:.6}
+
+/* Small screens adjustments */
+@media (max-width:599px){.products-grid{grid-template-columns:repeat(2,1fr)}.card-media{height:120px}}
+

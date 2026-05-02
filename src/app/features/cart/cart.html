@@ -1,0 +1,96 @@
+<div class="container">
+  <div class="page-header">
+    <h1>Mon panier</h1>
+    <p *ngIf="cart">{{ cart.lignes?.length || 0 }} article(s)</p>
+  </div>
+
+  <app-loading-spinner *ngIf="loading"></app-loading-spinner>
+
+  <div class="empty-state" *ngIf="!loading && isEmpty">
+    <span class="empty-icon">🛒</span>
+    <h3>Votre panier est vide</h3>
+    <p>Découvrez notre catalogue et ajoutez des produits à votre panier.</p>
+    <a routerLink="/products" class="btn btn-primary">Explorer le catalogue</a>
+  </div>
+
+  <div class="cart-layout" *ngIf="!loading && !isEmpty && cart">
+    <!-- Items -->
+    <div class="cart-items">
+      <div *ngFor="let item of cart.lignes" class="cart-item animate-fade">
+        <div class="item-img">
+          <img *ngIf="item.productImage" [src]="item.productImage" [alt]="item.productNom" />
+          <span *ngIf="!item.productImage">🛍️</span>
+        </div>
+        <div class="item-info">
+          <a [routerLink]="'/products/' + item.productId" class="item-name">{{ item.productNom }}</a>
+          <p class="item-variant text-muted" *ngIf="item.variantInfo">{{ item.variantInfo }}</p>
+          <div class="item-price-unit">{{ item.prixUnitaire | number:'1.2-2' }} TND / unité</div>
+        </div>
+        <div class="item-qty">
+          <button class="qty-btn-sm" (click)="updateQty(item.id, item.quantite - 1)">−</button>
+          <span class="qty-val-sm">{{ item.quantite }}</span>
+          <button class="qty-btn-sm" (click)="updateQty(item.id, item.quantite + 1)">+</button>
+        </div>
+        <div class="item-subtotal">{{ item.sousTotal | number:'1.2-2' }} TND</div>
+        <button class="remove-btn" (click)="removeItem(item.id)" title="Supprimer">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="m18 6-12 12M6 6l12 12"/>
+          </svg>
+        </button>
+      </div>
+    </div>
+
+    <!-- Summary -->
+    <div class="cart-summary">
+      <div class="summary-card">
+        <h3>Récapitulatif</h3>
+        <div class="summary-lines">
+          <div class="summary-line">
+            <span>Sous-total</span>
+            <span>{{ cart.sousTotal | number:'1.2-2' }} TND</span>
+          </div>
+          <div class="summary-line" *ngIf="cart.remise > 0">
+            <span class="text-success">Remise</span>
+            <span class="text-success">−{{ cart.remise | number:'1.2-2' }} TND</span>
+          </div>
+          <div class="summary-line">
+            <span>Livraison</span>
+            <span *ngIf="cart.fraisLivraison > 0">{{ cart.fraisLivraison | number:'1.2-2' }} TND</span>
+            <span *ngIf="cart.fraisLivraison === 0" class="text-success">Gratuite</span>
+          </div>
+          <div class="divider"></div>
+          <div class="summary-line total-line">
+            <span>Total TTC</span>
+            <span class="total-price">{{ cart.totalTTC | number:'1.2-2' }} TND</span>
+          </div>
+        </div>
+
+        <!-- Coupon -->
+        <div class="coupon-section">
+          <p class="block-label">Code promotionnel</p>
+          <div *ngIf="!cart.codeCoupon" class="coupon-input">
+            <input type="text" [(ngModel)]="couponCode" class="form-control" placeholder="Votre code"
+                   (keyup.enter)="applyCoupon()" />
+            <button class="btn btn-outline btn-sm" (click)="applyCoupon()" [disabled]="applyingCoupon">
+              {{ applyingCoupon ? '...' : 'Appliquer' }}
+            </button>
+          </div>
+          <div *ngIf="cart.codeCoupon" class="coupon-applied">
+            <span class="badge badge-success">✓ {{ cart.codeCoupon }}</span>
+            <button class="btn btn-ghost btn-sm" (click)="removeCoupon()">Retirer</button>
+          </div>
+        </div>
+
+        <button class="btn btn-primary w-full btn-lg" (click)="checkout()">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/>
+          </svg>
+          Commander ({{ cart.totalTTC | number:'1.2-2' }} TND)
+        </button>
+        <a routerLink="/products" class="btn btn-ghost w-full" style="justify-content:center;margin-top:8px;">
+          ← Continuer mes achats
+        </a>
+      </div>
+    </div>
+  </div>
+</div>

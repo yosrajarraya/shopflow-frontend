@@ -1,0 +1,111 @@
+<div class="container">
+  <div class="page-header"><h1>Commander</h1></div>
+
+  <!-- Steps bar -->
+  <div class="steps-bar" *ngIf="step < 3">
+    <div class="step" [class.active]="step===1" [class.done]="step>1">
+      <div class="step-num">{{ step>1 ? '✓' : '1' }}</div>
+      <span>Adresse</span>
+    </div>
+    <div class="step-line" [class.done]="step>1"></div>
+    <div class="step" [class.active]="step===2" [class.done]="step>2">
+      <div class="step-num">{{ step>2 ? '✓' : '2' }}</div>
+      <span>Récapitulatif</span>
+    </div>
+    <div class="step-line"></div>
+    <div class="step" [class.active]="step===3">
+      <div class="step-num">3</div>
+      <span>Confirmation</span>
+    </div>
+  </div>
+
+  <app-loading-spinner *ngIf="loading"></app-loading-spinner>
+
+  <!-- Step 1: Address -->
+  <div *ngIf="!loading && step === 1" class="checkout-grid animate-fade">
+    <div class="checkout-card">
+      <h3>Adresse de livraison</h3>
+      <p class="text-muted" style="margin-bottom:24px;">Saisissez votre adresse complète.</p>
+      <form [formGroup]="form">
+        <div class="form-group">
+          <label>Adresse *</label>
+          <textarea formControlName="adresseLivraison" class="form-control" rows="3"
+                    placeholder="Ex: 10 Rue de la République, Tunis 1001, Tunisie"></textarea>
+          <span class="error-msg" *ngIf="adresse.invalid && adresse.touched">Adresse requise (min. 10 caractères).</span>
+        </div>
+        <div class="form-group">
+          <label>Notes (optionnel)</label>
+          <textarea formControlName="notes" class="form-control" rows="2"
+                    placeholder="Instructions pour la livraison..."></textarea>
+        </div>
+        <button class="btn btn-primary btn-lg w-full" (click)="nextStep()">
+          Continuer → Récapitulatif
+        </button>
+      </form>
+    </div>
+    <div class="summary-card" *ngIf="cart">
+      <h4>Votre panier</h4>
+      <div class="divider mt-2 mb-3"></div>
+      <div class="summary-lines">
+        <div class="summary-line"><span>Sous-total</span><span>{{ cart.sousTotal | number:'1.2-2' }} TND</span></div>
+        <div class="summary-line" *ngIf="cart.remise > 0"><span class="text-success">Remise</span><span class="text-success">−{{ cart.remise | number:'1.2-2' }} TND</span></div>
+        <div class="summary-line"><span>Livraison</span><span *ngIf="cart.fraisLivraison>0">{{ cart.fraisLivraison | number:'1.2-2' }} TND</span><span *ngIf="cart.fraisLivraison===0" class="text-success">Gratuite</span></div>
+        <div class="divider"></div>
+        <div class="summary-line total-line"><span>Total TTC</span><span class="total-price">{{ cart.totalTTC | number:'1.2-2' }} TND</span></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Step 2: Recap -->
+  <div *ngIf="!loading && step === 2 && cart" class="checkout-grid animate-fade">
+    <div class="checkout-card">
+      <h3>Vérification de la commande</h3>
+      <div class="recap-address">
+        <p class="block-label">Adresse de livraison</p>
+        <p>{{ adresse.value }}</p>
+      </div>
+      <div class="recap-items">
+        <div *ngFor="let item of cart.lignes" class="recap-item">
+          <div class="recap-item-img">
+            <img *ngIf="item.productImage" [src]="item.productImage" [alt]="item.productNom" />
+            <span *ngIf="!item.productImage">🛍️</span>
+          </div>
+          <div class="recap-item-info">
+            <span class="recap-item-name">{{ item.productNom }}</span>
+            <span class="text-muted" style="font-size:.8rem;" *ngIf="item.variantInfo">{{ item.variantInfo }}</span>
+            <span class="text-muted" style="font-size:.8rem;">× {{ item.quantite }}</span>
+          </div>
+          <span class="recap-item-price">{{ item.sousTotal | number:'1.2-2' }} TND</span>
+        </div>
+      </div>
+      <div style="display:flex;gap:12px;margin-top:24px;">
+        <button class="btn btn-ghost btn-lg" (click)="step=1">← Modifier</button>
+        <button class="btn btn-primary btn-lg flex-1" (click)="placeOrder()" [disabled]="submitting">
+          {{ submitting ? 'Traitement...' : 'Confirmer la commande' }}
+        </button>
+      </div>
+    </div>
+    <div class="summary-card">
+      <h4>Récapitulatif</h4>
+      <div class="divider mt-2 mb-3"></div>
+      <div class="summary-lines">
+        <div class="summary-line"><span>Sous-total</span><span>{{ cart.sousTotal | number:'1.2-2' }} TND</span></div>
+        <div class="summary-line" *ngIf="cart.remise > 0"><span class="text-success">Remise</span><span class="text-success">−{{ cart.remise | number:'1.2-2' }} TND</span></div>
+        <div class="summary-line"><span>Livraison</span><span *ngIf="cart.fraisLivraison>0">{{ cart.fraisLivraison | number:'1.2-2' }} TND</span><span *ngIf="cart.fraisLivraison===0" class="text-success">Gratuite</span></div>
+        <div class="divider"></div>
+        <div class="summary-line total-line"><span>Total TTC</span><span class="total-price">{{ cart.totalTTC | number:'1.2-2' }} TND</span></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Step 3: Success -->
+  <div *ngIf="step === 3" class="success-state animate-fade">
+    <div class="success-icon">✓</div>
+    <h2>Commande confirmée !</h2>
+    <p *ngIf="createdOrder">Commande n° <strong>{{ createdOrder.numeroCommande }}</strong> — nous vous contacterons bientôt.</p>
+    <div class="success-actions">
+      <a routerLink="/orders" class="btn btn-outline btn-lg">Voir mes commandes</a>
+      <a routerLink="/products" class="btn btn-primary btn-lg">Continuer mes achats</a>
+    </div>
+  </div>
+</div>

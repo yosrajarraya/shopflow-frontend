@@ -1,0 +1,188 @@
+<div class="container product-form-page">
+  <div class="product-hero animate-fade">
+    <div>
+      <a routerLink="/products" class="back-link">← Retour au catalogue</a>
+      <div class="hero-copy">
+        <span class="hero-badge">{{ editMode ? 'Edition produit' : 'Nouveau produit' }}</span>
+        <h1>{{ editMode ? 'Modifier le produit' : 'Créer une fiche produit' }}</h1>
+        <p>
+          Structurez une fiche claire, ajoutez les visuels, choisissez les catégories et gardez un aperçu vivant à droite.
+        </p>
+      </div>
+    </div>
+
+    <div class="hero-stats">
+      <div class="stat-pill">
+        <span class="stat-label">Mode</span>
+        <strong>{{ editMode ? 'Mise à jour' : 'Création' }}</strong>
+      </div>
+      <div class="stat-pill">
+        <span class="stat-label">Catégories</span>
+        <strong>{{ form.get('categoryIds')?.value?.length || 0 }}</strong>
+      </div>
+      <div class="stat-pill">
+        <span class="stat-label">Images</span>
+        <strong>{{ images.length }}</strong>
+      </div>
+    </div>
+  </div>
+
+  <app-loading-spinner *ngIf="loading"></app-loading-spinner>
+
+  <div *ngIf="!loading" class="form-layout">
+    <section class="editor-card card-surface animate-fade">
+      <form [formGroup]="form" (ngSubmit)="onSubmit()" class="product-form">
+        <div class="form-section">
+          <div class="section-header">
+            <div>
+              <p class="section-eyebrow">Informations générales</p>
+              <h2>Base du produit</h2>
+            </div>
+            <p class="section-note">Nom, description et identité du produit.</p>
+          </div>
+
+          <div class="form-group">
+            <label>Nom du produit *</label>
+            <input type="text" formControlName="nom" class="form-control" placeholder="Ex: Chaussures de sport" />
+            <span class="error-msg" *ngIf="nom.invalid && nom.touched">Nom requis (min. 3 caractères).</span>
+          </div>
+
+          <div class="form-group">
+            <label>Description *</label>
+            <textarea
+              formControlName="description"
+              class="form-control"
+              rows="5"
+              placeholder="Décrivez votre produit en détail..."></textarea>
+            <span class="error-msg" *ngIf="description.invalid && description.touched">Description requise (min. 20 caractères).</span>
+          </div>
+        </div>
+
+        <div class="form-section">
+          <div class="section-header">
+            <div>
+              <p class="section-eyebrow">Prix & stock</p>
+              <h2>Valeurs commerciales</h2>
+            </div>
+            <p class="section-note">Gardez le prix lisible et le stock facile à surveiller.</p>
+          </div>
+
+          <div class="form-row-3">
+            <div class="form-group">
+              <label>Prix (TND) *</label>
+              <input type="number" formControlName="prix" class="form-control" placeholder="0.00" step="0.01" min="0" />
+              <span class="error-msg" *ngIf="prix.invalid && prix.touched">Prix requis (> 0).</span>
+            </div>
+            <div class="form-group">
+              <label>Prix promo (TND)</label>
+              <input type="number" formControlName="prixPromo" class="form-control" placeholder="Optionnel" step="0.01" min="0" />
+            </div>
+            <div class="form-group">
+              <label>Stock *</label>
+              <input type="number" formControlName="stock" class="form-control" placeholder="0" min="0" />
+              <span class="error-msg" *ngIf="stock.invalid && stock.touched">Stock requis (≥ 0).</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="form-section">
+          <div class="section-header">
+            <div>
+              <p class="section-eyebrow">Images</p>
+              <h2>Visuels du produit</h2>
+            </div>
+            <p class="section-note">Ajoutez des URLs pour constituer la galerie.</p>
+          </div>
+
+          <div class="image-list">
+            <div *ngFor="let ctrl of images.controls; let i = index" class="image-row">
+              <input
+                type="url"
+                [formControl]="$any(ctrl)"
+                class="form-control"
+                placeholder="https://exemple.com/image.jpg" />
+              <button type="button" class="btn btn-danger btn-sm image-remove" (click)="removeImage(i)" *ngIf="images.length > 1">
+                Supprimer
+              </button>
+            </div>
+          </div>
+
+          <button type="button" class="btn btn-outline btn-sm" (click)="addImage()">+ Ajouter une image</button>
+        </div>
+
+        <div class="form-section">
+          <div class="section-header">
+            <div>
+              <p class="section-eyebrow">Catégories</p>
+              <h2>Positionnement catalogue</h2>
+            </div>
+            <p class="section-note">Sélection multiple possible selon votre arborescence.</p>
+          </div>
+
+          <div class="categories-picker">
+            <button
+              type="button"
+              *ngFor="let cat of categories"
+              class="cat-chip"
+              [class.selected]="isSelected(cat.id)"
+              (click)="toggleCategory(cat.id)">
+              <span class="cat-check">{{ isSelected(cat.id) ? '✓' : '+' }}</span>
+              <span>{{ cat.nom }}</span>
+            </button>
+          </div>
+        </div>
+
+        <div class="form-actions-bottom">
+          <button type="submit" class="btn btn-primary btn-lg" [disabled]="submitting">
+            {{ submitting ? 'Enregistrement...' : (editMode ? 'Modifier le produit' : 'Créer le produit') }}
+          </button>
+          <a routerLink="/products" class="btn btn-ghost btn-lg">Annuler</a>
+        </div>
+      </form>
+    </section>
+
+    <aside class="preview-column animate-fade">
+      <div class="preview-card card-surface">
+        <div class="section-header preview-head">
+          <div>
+            <p class="section-eyebrow">Aperçu</p>
+            <h2>Carte produit</h2>
+          </div>
+          <span class="preview-chip">Live</span>
+        </div>
+
+        <div class="preview-visual">
+          <img *ngIf="previewImage" [src]="previewImage" alt="preview" />
+          <span *ngIf="!previewImage" class="preview-placeholder">🖼️</span>
+        </div>
+
+        <div class="preview-body">
+          <p class="preview-name">{{ form.get('nom')?.value || 'Nom du produit' }}</p>
+          <p class="preview-description">{{ form.get('description')?.value || 'La description apparaîtra ici au fil de la saisie.' }}</p>
+          <p class="preview-price">
+            {{ (form.get('prixPromo')?.value || form.get('prix')?.value || 0) | number:'1.2-2' }} TND
+          </p>
+
+          <div class="preview-metrics">
+            <div>
+              <span>Stock</span>
+              <strong>{{ form.get('stock')?.value || 0 }}</strong>
+            </div>
+            <div>
+              <span>Catégories</span>
+              <strong>{{ form.get('categoryIds')?.value?.length || 0 }}</strong>
+            </div>
+          </div>
+
+          <div class="preview-tags" *ngIf="form.get('categoryIds')?.value?.length; else previewEmptyCategories">
+            <span class="preview-tag" *ngFor="let cat of categories" [class.hidden]="!isSelected(cat.id)">{{ cat.nom }}</span>
+          </div>
+
+          <ng-template #previewEmptyCategories>
+            <p class="preview-empty">Aucune catégorie sélectionnée pour l’instant.</p>
+          </ng-template>
+        </div>
+      </div>
+    </aside>
+  </div>
+</div>

@@ -1,0 +1,16 @@
+<div class="toast-container">
+  <div
+    *ngFor="let t of toastService.toasts$ | async; trackBy: trackById"
+    class="toast toast-{{ t.type }} animate-fade">
+    <span class="toast-icon">
+      <ng-container [ngSwitch]="t.type">
+        <span *ngSwitchCase="'success'">✓</span>
+        <span *ngSwitchCase="'error'">✕</span>
+        <span *ngSwitchCase="'warning'">!</span>
+        <span *ngSwitchDefault>i</span>
+      </ng-container>
+    </span>
+    <span class="toast-msg">{{ t.message }}</span>
+    <button class="toast-close" (click)="toastService.remove(t.id)">×</button>
+  </div>
+</div>

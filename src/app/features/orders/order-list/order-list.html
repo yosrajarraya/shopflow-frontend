@@ -1,0 +1,74 @@
+<div class="container">
+  <div class="page-header">
+    <h1>{{ authService.isAdmin() ? 'Toutes les commandes' : 'Mes commandes' }}</h1>
+    <p>{{ orders.length }} commande(s) au total</p>
+  </div>
+
+  <div class="status-filters-bar">
+    <button *ngFor="let s of allStatuses" class="filter-chip" [class.active]="filterStatus === s" (click)="selectStatus(s)">
+      {{ s === 'ALL' ? 'Toutes' : statusLabel(s) }}
+    </button>
+  </div>
+
+  <app-loading-spinner *ngIf="loading"></app-loading-spinner>
+
+  <div class="empty-state" *ngIf="!loading && !filtered.length">
+    <span class="empty-icon">📦</span>
+    <h3>Aucune commande</h3>
+    <p>{{ filterStatus !== 'ALL' ? 'Aucune commande avec ce statut.' : 'Vous n\'avez pas encore passé de commande.' }}</p>
+    <a *ngIf="filterStatus === 'ALL'" routerLink="/products" class="btn btn-primary">Commencer mes achats</a>
+  </div>
+
+  <div class="orders-list" *ngIf="!loading && filtered.length">
+    <div class="orders-grid">
+      <div *ngFor="let order of paginatedOrders" class="order-card-compact animate-fade">
+        <div class="card-header">
+          <div class="header-left">
+            <div class="order-num-badge">{{ order.numeroCommande }}</div>
+            <div class="order-date">{{ order.dateCommande | date:'dd/MM/yyyy' }}</div>
+          </div>
+          <span class="badge" [ngClass]="statusClass(order.statut)">{{ statusLabel(order.statut) }}</span>
+        </div>
+
+        <div class="card-items">
+          <div class="items-preview">
+            <div *ngFor="let ligne of order.lignes.slice(0,2)" class="item-card">
+              <div class="item-image">
+                <img *ngIf="ligne.productImage" [src]="ligne.productImage" [alt]="ligne.productNom" />
+                <div *ngIf="!ligne.productImage" class="image-placeholder">📦</div>
+              </div>
+              <div class="item-info">
+                <span class="item-name">{{ ligne.productNom }}</span>
+                <span class="item-qty">×{{ ligne.quantite }}</span>
+              </div>
+            </div>
+            <div *ngIf="order.lignes.length > 2" class="more-items-card">
+              <span class="more-text">+{{ order.lignes.length - 2 }}</span>
+              <span class="more-label">article(s)</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="card-footer">
+          <div class="price-total">{{ order.totalTTC | number:'1.2-2' }} TND</div>
+          <div class="card-actions">
+            <button *ngIf="authService.isCustomer() && (order.statut === 'PENDING' || order.statut === 'PAID')"
+                    class="btn btn-danger btn-xs" (click)="cancelOrder(order.id)">Annuler</button>
+            <select *ngIf="authService.isAdmin() || authService.isSeller()"
+                    class="status-select-compact" [value]="order.statut"
+                    (change)="updateStatus(order.id, $any($event.target).value)">
+              <option *ngFor="let s of adminStatuses" [value]="s">{{ statusLabel(s) }}</option>
+            </select>
+            <a [routerLink]="'/orders/' + order.id" class="btn btn-outline btn-xs">Détails</a>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="pagination-compact" *ngIf="totalPages > 1">
+      <button class="btn btn-outline btn-sm" [disabled]="currentPage === 1" (click)="prevPage()">← Précédent</button>
+      <span class="page-info">Page {{ currentPage }}/{{ totalPages }} ({{ shownCount }}/{{ filtered.length }})</span>
+      <button class="btn btn-outline btn-sm" [disabled]="currentPage >= totalPages" (click)="nextPage()">Suivant →</button>
+    </div>
+  </div>
+</div>

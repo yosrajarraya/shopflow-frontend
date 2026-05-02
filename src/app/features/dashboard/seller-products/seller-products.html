@@ -1,0 +1,79 @@
+<div class="container">
+  <div class="page-header compact">
+    <div>
+      <h1>Mes produits</h1>
+      <p>Gérez et publiez vos produits</p>
+    </div>
+    <div class="header-actions">
+      <a routerLink="/products/new" class="btn btn-primary btn-lg">+ Ajouter un produit</a>
+    </div>
+  </div>
+
+  <app-loading-spinner *ngIf="loading"></app-loading-spinner>
+
+  <div *ngIf="!loading" class="content">
+    <div class="stats-row">
+      <div class="stat-card">
+        <div class="stat-value">{{ totalElements }}</div>
+        <div class="stat-label">Produit(s)</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-value">Page {{ currentPage + 1 }}</div>
+        <div class="stat-label">sur {{ totalPages }}</div>
+      </div>
+    </div>
+
+    <div *ngIf="products.length > 0; else emptyState" class="products-grid">
+      <div *ngFor="let p of products" class="product-card" [class.deleting]="deletingId === p.id">
+        <div class="card-media" [routerLink]="['/products', p.id]">
+          <img [src]="p.images[0] || '/assets/no-image.png'" alt="{{ p.nom }}">
+          <div class="stock-badge" [ngClass]="p.stock > 10 ? 'in-stock' : p.stock > 0 ? 'low-stock' : 'out-of-stock'">
+            <span *ngIf="p.stock > 0">Stock: {{ p.stock }}</span>
+            <span *ngIf="p.stock === 0">Rupture</span>
+          </div>
+        </div>
+
+        <div class="card-body">
+          <h4 class="product-name" [routerLink]="['/products', p.id]">{{ p.nom }}</h4>
+          <p class="product-category">{{ p.categorie?.nom || 'N/A' }}</p>
+
+          <div class="price-row">
+            <span class="price" *ngIf="!p.prixPromo">{{ p.prix | currency:'TND':'symbol':'1.2-2' }}</span>
+            <span class="price-promo" *ngIf="p.prixPromo">{{ p.prixPromo | currency:'TND':'symbol':'1.2-2' }}</span>
+            <span class="price-original" *ngIf="p.prixPromo">{{ p.prix | currency:'TND':'symbol':'1.2-2' }}</span>
+          </div>
+
+          <div class="meta-row">
+            <app-star-rating [note]="p.noteMoyenne" [showLabel]="false"></app-star-rating>
+            <span class="rating-text" *ngIf="p.noteMoyenne">{{ p.noteMoyenne | number:'1.1-1' }}/5</span>
+          </div>
+
+          <div class="actions-row">
+            <a [routerLink]="['/products', p.id, 'edit']" class="btn btn-outline btn-sm edit-btn">Modifier</a>
+            <button class="btn btn-danger btn-sm delete-btn" (click)="supprimerProduit(p.id)" [disabled]="deletingId === p.id">
+              <span *ngIf="deletingId !== p.id">Supprimer</span>
+              <span *ngIf="deletingId === p.id">Suppression...</span>
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <ng-template #emptyState>
+      <div class="empty-state compact">
+        <span class="empty-icon">📦</span>
+        <h3>Aucun produit publié</h3>
+        <p>Commencez par ajouter votre premier produit à la plateforme</p>
+        <a routerLink="/products/new" class="btn btn-primary btn-lg">Publier un produit</a>
+      </div>
+    </ng-template>
+
+    <div *ngIf="totalPages > 1" class="pagination compact">
+      <button class="btn btn-outline btn-sm" (click)="goToPage(currentPage - 1)" [disabled]="!canPrevious">← Précédent</button>
+      <div class="pages">
+        <button *ngFor="let page of pages" class="page-btn" [class.active]="page === currentPage" (click)="goToPage(page)">{{ page + 1 }}</button>
+      </div>
+      <button class="btn btn-outline btn-sm" (click)="goToPage(currentPage + 1)" [disabled]="!canNext">Suivant →</button>
+    </div>
+  </div>
+</div>
