@@ -155,6 +155,18 @@
               class="order-row"
               [routerLink]="'/orders/' + order.id">
               <div class="order-main">
+                <!-- Images produits + quantités -->
+                <div class="order-products-preview">
+                  <div *ngFor="let ligne of (order.lignes || []).slice(0,2)" class="order-product-chip">
+                    <div class="opc-img">
+                      <img *ngIf="ligne.productImage" [src]="ligne.productImage" [alt]="ligne.productNom" />
+                      <span *ngIf="!ligne.productImage">🛍️</span>
+                    </div>
+                    <span class="opc-name">{{ ligne.productNom }}</span>
+                    <span class="opc-qty">×{{ ligne.quantite }}</span>
+                  </div>
+                  <span *ngIf="(order.lignes || []).length > 2" class="opc-more">+{{ (order.lignes || []).length - 2 }}</span>
+                </div>
                 <div class="order-num">{{ order.numeroCommande }}</div>
                 <div class="order-meta">
                   {{ order.customerNom }} · {{ order.dateCommande | date:'dd/MM/yyyy HH:mm' }}

@@ -10,8 +10,30 @@ export class ProductService {
 
   constructor(private http: HttpClient) {}
 
-  listerProduits(page = 0, size = 12): Observable<Page<ProductResponse>> {
-    const params = new HttpParams().set('page', page).set('size', size);
+  listerProduits(page = 0, size = 12, sort = 'dateCreation'): Observable<Page<ProductResponse>> {
+    const params = new HttpParams()
+      .set('page', page)
+      .set('size', size)
+      .set('sort', sort + ',desc');
+    return this.http.get<Page<ProductResponse>>(this.API, { params });
+  }
+
+  filtrerProduits(
+    categoryId: number | null,
+    prixMin: number | null,
+    prixMax: number | null,
+    promo: boolean,
+    page = 0,
+    sort = 'dateCreation'
+  ): Observable<Page<ProductResponse>> {
+    let params = new HttpParams()
+      .set('page', page)
+      .set('size', 12)
+      .set('sort', sort + ',desc')
+      .set('promo', promo);
+    if (categoryId != null) params = params.set('categoryId', categoryId);
+    if (prixMin != null)    params = params.set('prixMin', prixMin);
+    if (prixMax != null)    params = params.set('prixMax', prixMax);
     return this.http.get<Page<ProductResponse>>(this.API, { params });
   }
 
@@ -53,7 +75,6 @@ export class ProductService {
     return this.http.delete<void>(`${this.API}/${id}`);
   }
 
-  // Produits du vendeur connecté (paginé)
   mesProduits(page = 0, size = 12): Observable<Page<ProductResponse>> {
     const params = new HttpParams().set('page', page).set('size', size);
     return this.http.get<Page<ProductResponse>>(`${this.API}/my`, { params });

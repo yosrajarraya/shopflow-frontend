@@ -1,4 +1,3 @@
-<p>register works!</p>
 <div class="auth-page">
   <div class="auth-card animate-fade">
     <div class="auth-brand">
@@ -59,13 +58,13 @@
         <label>Mot de passe</label>
         <div class="input-with-icon">
           <input [type]="showPass ? 'text' : 'password'" formControlName="motDePasse"
-                 class="form-control" placeholder="Min. 6 caractères" />
+                 class="form-control" placeholder="Min. 8 caractères, majuscule, chiffre, spécial" />
           <button type="button" class="pass-toggle" (click)="showPass = !showPass">
             {{ showPass ? '🙈' : '👁️' }}
           </button>
         </div>
         <span class="error-msg" *ngIf="motDePasse.invalid && motDePasse.touched">
-          Mot de passe requis (min. 6 caractères).
+          Mot de passe requis: 8 caractères minimum avec majuscule, minuscule, chiffre et caractère spécial.
         </span>
       </div>
 

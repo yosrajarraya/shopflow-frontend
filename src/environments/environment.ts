@@ -1,4 +1,4 @@
 export const environment = {
   production: false,
-  apiUrl: 'https://shopflow-production-18f3.up.railway.app/api'
+  apiUrl: 'http://localhost:8080/api'
 };

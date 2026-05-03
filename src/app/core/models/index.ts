@@ -18,6 +18,7 @@ export interface AuthResponse {
   tokenType: string;
   userId: number;
   nom: string;
+  prenom: string;
   email: string;
   role: 'CUSTOMER' | 'SELLER' | 'ADMIN';
 }
@@ -163,7 +164,8 @@ export interface OrderResponse {
 }
 
 export interface OrderRequest {
-  adresseLivraison: string;
+  adresseLivraison?: string;
+  addressId?: number;
   notes?: string;
 }
 
@@ -206,4 +208,22 @@ export interface UserUpdateRequest {
   email: string;
   telephone?: string;
   role: 'CUSTOMER' | 'SELLER' | 'ADMIN';
+}
+
+// ─── Address ─────────────────────────────────────────────────────────────────
+export interface AddressResponse {
+  id: number;
+  rue: string;
+  ville: string;
+  codePostal: string;
+  pays: string;
+  principal: boolean;
+}
+
+export interface AddressRequest {
+  rue: string;
+  ville: string;
+  codePostal: string;
+  pays: string;
+  principal: boolean;
 }

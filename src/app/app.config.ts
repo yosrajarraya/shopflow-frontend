@@ -8,6 +8,9 @@ import { AuthGuard } from './core/guards/auth-guard';
 import { HomeComponent } from './features/home/home';
 import { LoginComponent } from './features/auth/login/login';
 import { RegisterComponent } from './features/auth/register/register';
+import { ForgotPasswordComponent } from './features/auth/forgot-password/forgot-password';
+import { ResetPasswordComponent } from './features/auth/reset-password/reset-password';
+import { ProfileComponent } from './features/profile/profile';
 import { ProductListComponent } from './features/products/product-list/product-list';
 import { ProductDetailComponent } from './features/products/product-detail/product-detail';
 import { ProductFormComponent } from './features/products/product-form/product-form';
@@ -22,11 +25,16 @@ import { SellerOrdersComponent } from './features/dashboard/seller-orders/seller
 import { SellerProductsComponent } from './features/dashboard/seller-products/seller-products';
 import { CategoryManagerComponent } from './features/categories/category-manager/category-manager';
 import { UserManagementComponent } from './features/admin/users/user-management';
+import { ReviewModerationComponent } from './features/admin/reviews/review-moderation';
+import { CouponManagementComponent } from './features/admin/coupons/coupon-management';
 
 const routes: Routes = [
   { path: '', component: HomeComponent },
   { path: 'auth/login', component: LoginComponent },
   { path: 'auth/register', component: RegisterComponent },
+  { path: 'auth/forgot-password', component: ForgotPasswordComponent },
+  { path: 'auth/reset-password', component: ResetPasswordComponent },
+  { path: 'profile', component: ProfileComponent, canActivate: [AuthGuard], data: { roles: ['CUSTOMER','SELLER','ADMIN'] } },
   { path: 'products', component: ProductListComponent },
   { path: 'products/new', component: ProductFormComponent, canActivate: [AuthGuard], data: { roles: ['SELLER','ADMIN'] } },
   { path: 'products/:id', component: ProductDetailComponent },
@@ -42,6 +50,8 @@ const routes: Routes = [
   { path: 'seller/products', component: SellerProductsComponent, canActivate: [AuthGuard], data: { roles: ['SELLER'] } },
   { path: 'categories', component: CategoryManagerComponent, canActivate: [AuthGuard], data: { roles: ['ADMIN'] } },
   { path: 'admin/users', component: UserManagementComponent, canActivate: [AuthGuard], data: { roles: ['ADMIN'] } },
+  { path: 'admin/reviews', component: ReviewModerationComponent, canActivate: [AuthGuard], data: { roles: ['ADMIN'] } },
+  { path: 'admin/coupons', component: CouponManagementComponent, canActivate: [AuthGuard], data: { roles: ['ADMIN'] } },
   { path: '**', redirectTo: '' }
 ];
 

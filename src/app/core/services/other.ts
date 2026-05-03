@@ -144,6 +144,10 @@ export class ReviewService {
     return this.http.put<ReviewResponse>(`${this.API}/${id}/approve`, null);
   }
 
+  desapprouverAvis(id: number): Observable<ReviewResponse> {
+    return this.http.put<ReviewResponse>(`${this.API}/${id}/disapprove`, null);
+  }
+
   rejeterAvis(id: number): Observable<void> {
     return this.http.delete<void>(`${this.API}/${id}`);
   }

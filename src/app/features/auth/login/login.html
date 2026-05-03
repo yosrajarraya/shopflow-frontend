@@ -28,6 +28,7 @@
         <span class="error-msg" *ngIf="motDePasse.invalid && motDePasse.touched">
           Mot de passe requis (min. 6 caractères).
         </span>
+        <a routerLink="/auth/forgot-password" class="forgot-password-link">Mot de passe oublié?</a>
       </div>
 
       <button type="submit" class="btn btn-primary w-full btn-lg" [disabled]="loading">

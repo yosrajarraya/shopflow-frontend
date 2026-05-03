@@ -63,8 +63,8 @@
         <div *ngIf="stats.commandesRecentes?.length; else emptyOrders" class="orders-table">
           <div class="table-header">
             <span>Commande</span>
+            <span>Produits</span>
             <span>Client</span>
-            <span>Date</span>
             <span>Statut</span>
             <span>Total</span>
             <span>Action</span>
@@ -72,8 +72,19 @@
           <div class="table-body">
             <div *ngFor="let order of stats.commandesRecentes" class="table-row">
               <a [routerLink]="'/orders/' + order.id" class="order-link">{{ order.numeroCommande }}</a>
+              <!-- Produits avec images et quantités -->
+              <div class="order-products-preview">
+                <div *ngFor="let ligne of (order.lignes || []).slice(0,2)" class="order-product-chip">
+                  <div class="opc-img">
+                    <img *ngIf="ligne.productImage" [src]="ligne.productImage" [alt]="ligne.productNom" />
+                    <span *ngIf="!ligne.productImage">🛍️</span>
+                  </div>
+                  <span class="opc-name">{{ ligne.productNom }}</span>
+                  <span class="opc-qty">×{{ ligne.quantite }}</span>
+                </div>
+                <span *ngIf="(order.lignes || []).length > 2" class="opc-more">+{{ (order.lignes || []).length - 2 }}</span>
+              </div>
               <div class="col-client">{{ order.customerNom }}</div>
-              <div class="col-date">{{ order.dateCommande | date:'dd/MM/yyyy' }}</div>
               <div><span class="badge" [ngClass]="statusClass(order.statut)">{{ statusLabel(order.statut) }}</span></div>
               <div class="col-total">{{ order.totalTTC | number:'1.2-2' }} TND</div>
               <div>

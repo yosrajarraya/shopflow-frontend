@@ -29,7 +29,11 @@ export class RegisterComponent {
       nom:        ['', [Validators.required, Validators.minLength(2)]],
       prenom:     ['', [Validators.required, Validators.minLength(2)]],
       email:      ['', [Validators.required, Validators.email]],
-      motDePasse: ['', [Validators.required, Validators.minLength(6)]],
+      motDePasse: ['', [
+        Validators.required,
+        Validators.minLength(8),
+        Validators.pattern(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^A-Za-z0-9]).+$/)
+      ]],
       telephone:  [''],
       nomBoutique:   ['']
     });
@@ -62,7 +66,11 @@ export class RegisterComponent {
         else this.router.navigate(['/products']);
       },
       error: (err) => {
-        this.toastService.error(err?.error?.message || 'Erreur lors de l\'inscription.');
+        const backendMessage = err?.error?.message
+          || err?.error?.errors?.[0]?.defaultMessage
+          || err?.error?.error
+          || 'Erreur lors de l\'inscription.';
+        this.toastService.error(backendMessage);
         this.loading = false;
       }
     });

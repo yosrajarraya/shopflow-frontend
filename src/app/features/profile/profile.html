@@ -1,0 +1,178 @@
+<div class="profile-container">
+  <!-- Header Section -->
+  <div class="profile-header">
+    <h1>Mon Profil</h1>
+    <p class="breadcrumb">Accueil > Profil</p>
+  </div>
+
+  <!-- User Info Card -->
+  <div class="info-card">
+    <h2>Informations Personnelles</h2>
+    <div class="info-grid">
+      <div class="info-item">
+        <label>Nom</label>
+        <p>{{ currentUser?.nom }}</p>
+      </div>
+      <div class="info-item">
+        <label>Prénom</label>
+        <p>{{ currentUser?.prenom }}</p>
+      </div>
+      <div class="info-item">
+        <label>Email</label>
+        <p>{{ currentUser?.email }}</p>
+      </div>
+      <div class="info-item">
+        <label>Rôle</label>
+        <p class="role-badge" [ngClass]="'role-' + (currentUser?.role | lowercase)">
+          {{ currentUser?.role }}
+        </p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Addresses Section -->
+  <div class="addresses-card">
+    <div class="addresses-header">
+      <h2>Mes Adresses</h2>
+      <button class="btn btn-primary" (click)="openAddAddressModal()">
+        ➕ Ajouter une adresse
+      </button>
+    </div>
+
+    <!-- Loading State -->
+    <div *ngIf="loading" class="loading">
+      <p>Chargement des adresses...</p>
+    </div>
+
+    <!-- Empty State -->
+    <div *ngIf="!loading && addresses.length === 0" class="empty-state">
+      <p>Aucune adresse enregistrée</p>
+      <p class="text-muted">Créez votre première adresse pour procéder à l'achat</p>
+    </div>
+
+    <!-- Addresses List -->
+    <div *ngIf="!loading && addresses.length > 0" class="addresses-list">
+      <div *ngFor="let address of addresses" class="address-card">
+        <div class="address-content">
+          <div class="address-main">
+            <p class="address-street">{{ address.rue }}</p>
+            <p class="address-city">{{ address.codePostal }} {{ address.ville }}, {{ address.pays }}</p>
+          </div>
+          <div class="address-badge" *ngIf="address.principal">
+            <span class="badge badge-primary">⭐ Adresse Principale</span>
+          </div>
+        </div>
+
+        <div class="address-actions">
+          <button class="btn btn-secondary btn-sm" (click)="openEditAddressModal(address)">
+            ✏️ Modifier
+          </button>
+          <button class="btn btn-danger btn-sm" (click)="deleteAddress(address.id)">
+            🗑️ Supprimer
+          </button>
+          <button
+            *ngIf="!address.principal"
+            class="btn btn-info btn-sm"
+            (click)="setMainAddress(address.id)">
+            ⭐ Définir comme principale
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Address Modal -->
+  <div *ngIf="showAddressModal" class="modal-overlay" (click)="closeAddressModal()">
+    <div class="modal-content" (click)="$event.stopPropagation()">
+      <div class="modal-header">
+        <h3>{{ editingAddressId ? 'Modifier une adresse' : 'Ajouter une adresse' }}</h3>
+        <button class="btn-close" (click)="closeAddressModal()">✕</button>
+      </div>
+
+      <form [formGroup]="addressForm" class="modal-body">
+        <!-- Rue -->
+        <div class="form-group">
+          <label for="rue">Rue *</label>
+          <input
+            id="rue"
+            type="text"
+            formControlName="rue"
+            class="form-control"
+            placeholder="Ex: 123 Rue de Paris"
+          />
+          <small *ngIf="addressForm.get('rue')?.invalid && addressForm.get('rue')?.touched" class="error">
+            Rue invalide (minimum 3 caractères)
+          </small>
+        </div>
+
+        <!-- Ville -->
+        <div class="form-group">
+          <label for="ville">Ville *</label>
+          <input
+            id="ville"
+            type="text"
+            formControlName="ville"
+            class="form-control"
+            placeholder="Ex: Paris"
+          />
+          <small *ngIf="addressForm.get('ville')?.invalid && addressForm.get('ville')?.touched" class="error">
+            Ville invalide (minimum 2 caractères)
+          </small>
+        </div>
+
+        <!-- Code Postal -->
+        <div class="form-group">
+          <label for="codePostal">Code Postal *</label>
+          <input
+            id="codePostal"
+            type="text"
+            formControlName="codePostal"
+            class="form-control"
+            placeholder="Ex: 75001"
+          />
+          <small *ngIf="addressForm.get('codePostal')?.invalid && addressForm.get('codePostal')?.touched" class="error">
+            Code Postal invalide (5 chiffres)
+          </small>
+        </div>
+
+        <!-- Pays -->
+        <div class="form-group">
+          <label for="pays">Pays *</label>
+          <input
+            id="pays"
+            type="text"
+            formControlName="pays"
+            class="form-control"
+            placeholder="Ex: France"
+          />
+          <small *ngIf="addressForm.get('pays')?.invalid && addressForm.get('pays')?.touched" class="error">
+            Pays invalide (minimum 2 caractères)
+          </small>
+        </div>
+
+        <!-- Principal Checkbox -->
+        <div class="form-group checkbox-group">
+          <label for="principal">
+            <input
+              id="principal"
+              type="checkbox"
+              formControlName="principal"
+            />
+            Définir comme adresse principale
+          </label>
+        </div>
+      </form>
+
+      <div class="modal-footer">
+        <button class="btn btn-secondary" (click)="closeAddressModal()">Annuler</button>
+        <button
+          class="btn btn-primary"
+          (click)="saveAddress()"
+          [disabled]="!isFormDirty"
+        >
+          {{ editingAddressId ? 'Mettre à jour' : 'Créer' }}
+        </button>
+      </div>
+    </div>
+  </div>
+</div>

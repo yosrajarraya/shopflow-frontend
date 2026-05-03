@@ -43,6 +43,13 @@
           <span class="user-name hide-mobile">{{ currentUser.nom }}</span>
         </button>
         <div class="user-dropdown">
+          <a routerLink="/profile" class="dropdown-item" (click)="closeUserMenu()">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
+              <circle cx="12" cy="7" r="4"/>
+            </svg>
+            Mon Profil
+          </a>
           <a [routerLink]="dashboardRoute" class="dropdown-item" (click)="closeUserMenu()">
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
               <rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/>
@@ -58,6 +65,25 @@
               <path d="M16 3.13a4 4 0 0 1 0 7.75"/>
             </svg>
             Utilisateurs
+          </a>
+          <a *ngIf="currentUser.role === 'ADMIN'" routerLink="/admin/reviews" class="dropdown-item" (click)="closeUserMenu()">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
+            </svg>
+            Modération avis
+          </a>
+          <a *ngIf="currentUser.role === 'ADMIN'" routerLink="/admin/coupons" class="dropdown-item" (click)="closeUserMenu()">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"/>
+              <line x1="7" y1="7" x2="7.01" y2="7"/>
+            </svg>
+            Coupons
+          </a>
+          <a *ngIf="currentUser.role === 'ADMIN'" routerLink="/categories" class="dropdown-item" (click)="closeUserMenu()">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/>
+            </svg>
+            Catégories
           </a>
           <a *ngIf="currentUser.role === 'CUSTOMER'" routerLink="/orders" class="dropdown-item" (click)="closeUserMenu()">
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">

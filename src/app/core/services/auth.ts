@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { BehaviorSubject, Observable, tap } from 'rxjs';
+import { BehaviorSubject, Observable, tap, throwError } from 'rxjs';
 import { Router } from '@angular/router';
 import { AuthResponse, LoginRequest, RegisterRequest } from '../models';
 import { environment } from '../../../environments/environment';
@@ -31,10 +31,33 @@ export class AuthService {
     );
   }
 
+  refreshToken(): Observable<AuthResponse> {
+    const refreshToken = this.currentUser?.refreshToken;
+    if (!refreshToken) {
+      return throwError(() => new Error('Refresh token absent'));
+    }
+
+    return this.http.post<AuthResponse>(`${this.API}/refresh`, null, {
+      params: { refreshToken }
+    }).pipe(
+      tap(res => this.storeUser({ ...this.currentUser, ...res } as AuthResponse))
+    );
+  }
+
   logout(): void {
     localStorage.removeItem('shopflow_user');
     this.currentUserSubject.next(null);
     this.router.navigate(['/auth/login']);
+  }
+
+  forgotPassword(email: string): Observable<string> {
+    return this.http.post<string>(`${this.API}/forgot-password`, { email });
+  }
+
+  resetPassword(token: string, newPassword: string): Observable<AuthResponse> {
+    return this.http.post<AuthResponse>(`${this.API}/reset-password`, { token, newPassword }).pipe(
+      tap(res => this.storeUser(res))
+    );
   }
 
   get currentUser(): AuthResponse | null { return this.currentUserSubject.value; }
@@ -46,10 +69,7 @@ export class AuthService {
   isCustomer(): boolean { return this.role === 'CUSTOMER'; }
 
   private storeUser(user: AuthResponse): void {
-    console.log('💾 Storing user:', user);
     localStorage.setItem('shopflow_user', JSON.stringify(user));
-    const stored = localStorage.getItem('shopflow_user');
-    console.log('✅ Verified stored in localStorage:', stored);
     this.currentUserSubject.next(user);
   }
 

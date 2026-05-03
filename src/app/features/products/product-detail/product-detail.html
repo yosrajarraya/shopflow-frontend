@@ -126,10 +126,13 @@
 
       <div class="reviews-list" *ngIf="hasReviews">
         <div class="reviews-grid">
-          <article *ngFor="let avis of product!.avis" class="review-card">
+          <article *ngFor="let avis of product!.avis" class="review-card" [class.review-card--pending]="!avis.approuve">
             <div class="review-header">
               <div class="review-author">{{ avis.customerNom }}</div>
-              <app-star-rating [note]="avis.note" [showLabel]="false"></app-star-rating>
+              <div class="review-header-right">
+                <app-star-rating [note]="avis.note" [showLabel]="false"></app-star-rating>
+                <span class="badge badge-warning review-pending-badge" *ngIf="!avis.approuve">En attente</span>
+              </div>
             </div>
             <p class="review-comment">{{ avis.commentaire }}</p>
             <span class="review-date text-muted">{{ avis.dateCreation | date:'dd/MM/yyyy' }}</span>

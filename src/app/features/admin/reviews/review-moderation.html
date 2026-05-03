@@ -1,0 +1,121 @@
+<div class="rm-page">
+
+  <!-- Header -->
+  <div class="rm-header">
+    <div class="rm-header__left">
+      <div class="rm-header__icon">⭐</div>
+      <div>
+        <h1>Modération des avis</h1>
+        <p>{{ allReviews.length }} avis au total · {{ totalPending }} en attente · {{ totalApproved }} approuvés</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- KPIs -->
+  <div class="rm-kpis">
+    <div class="rm-kpi rm-kpi--total">
+      <span class="rm-kpi__val">{{ allReviews.length }}</span>
+      <span class="rm-kpi__lbl">Total avis</span>
+    </div>
+    <div class="rm-kpi rm-kpi--approved">
+      <span class="rm-kpi__val">{{ totalApproved }}</span>
+      <span class="rm-kpi__lbl">Approuvés</span>
+    </div>
+    <div class="rm-kpi rm-kpi--pending">
+      <span class="rm-kpi__val">{{ totalPending }}</span>
+      <span class="rm-kpi__lbl">En attente</span>
+    </div>
+  </div>
+
+  <!-- Toolbar -->
+  <div class="rm-toolbar">
+    <div class="rm-search">
+      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/>
+      </svg>
+      <input type="text" placeholder="Rechercher par auteur ou commentaire..."
+        [(ngModel)]="searchQuery" (input)="applyFilters()" class="rm-search__input" />
+    </div>
+    <div class="rm-filter-group">
+      <button class="rm-filter-btn" [class.active]="filterStatus==='ALL'" (click)="filterStatus='ALL'; applyFilters()">Tous</button>
+      <button class="rm-filter-btn rm-filter-btn--approved" [class.active]="filterStatus==='APPROVED'" (click)="filterStatus='APPROVED'; applyFilters()">Approuvés</button>
+      <button class="rm-filter-btn rm-filter-btn--pending" [class.active]="filterStatus==='PENDING'" (click)="filterStatus='PENDING'; applyFilters()">En attente</button>
+    </div>
+  </div>
+
+  <!-- Loading -->
+  <div class="rm-skeleton-list" *ngIf="loading">
+    <div class="rm-skeleton" *ngFor="let i of [1,2,3,4,5]"></div>
+  </div>
+
+  <!-- Reviews Grid -->
+  <div class="rm-grid" *ngIf="!loading">
+
+    <div *ngIf="pagedReviews.length === 0" class="rm-empty">
+      <div class="rm-empty__icon">💬</div>
+      <p>Aucun avis trouvé</p>
+    </div>
+
+    <div *ngFor="let r of pagedReviews" class="rm-card" [class.rm-card--pending]="!r.approuve">
+
+      <!-- Card Header -->
+      <div class="rm-card__header">
+        <div class="rm-card__author">
+          <div class="rm-avatar">{{ r.customerNom.charAt(0) }}</div>
+          <div>
+            <div class="rm-author-name">{{ r.customerNom }}</div>
+            <div class="rm-author-date">{{ r.dateCreation | date:'dd/MM/yyyy à HH:mm' }}</div>
+          </div>
+        </div>
+        <div class="rm-card__status">
+          <span class="badge badge-success" *ngIf="r.approuve">✓ Approuvé</span>
+          <span class="badge badge-warning" *ngIf="!r.approuve">⏳ En attente</span>
+        </div>
+      </div>
+
+      <!-- Stars -->
+      <div class="rm-stars">
+        <span *ngFor="let s of stars(r.note)" class="rm-star" [class.rm-star--on]="s <= r.note">★</span>
+        <span class="rm-note-val">{{ r.note }}/5</span>
+      </div>
+
+      <!-- Comment -->
+      <p class="rm-comment">"{{ r.commentaire }}"</p>
+
+      <!-- Actions -->
+      <div class="rm-card__actions">
+        <button class="btn btn-success btn-sm" *ngIf="!r.approuve" (click)="approuver(r)">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+            <polyline points="20 6 9 17 4 12"/>
+          </svg>
+          Approuver
+        </button>
+        <button class="btn btn-outline btn-sm" *ngIf="r.approuve" (click)="desapprouver(r)">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="12" cy="12" r="10"/><line x1="4.93" y1="4.93" x2="19.07" y2="19.07"/>
+          </svg>
+          Masquer
+        </button>
+        <button class="btn btn-danger btn-sm" (click)="supprimer(r)">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <polyline points="3 6 5 6 21 6"/>
+            <path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/>
+          </svg>
+          Supprimer
+        </button>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- Pagination -->
+  <div class="rm-pagination" *ngIf="!loading && totalPages > 1">
+    <span class="rm-pagination__info">Page {{ currentPage }}/{{ totalPages }} · {{ filtered.length }} résultats</span>
+    <div class="rm-pagination__controls">
+      <button class="rm-page-btn" (click)="goPage(currentPage-1)" [disabled]="currentPage===1">‹</button>
+      <button *ngFor="let p of pages" class="rm-page-btn" [class.rm-page-btn--active]="p===currentPage" (click)="goPage(p)">{{ p }}</button>
+      <button class="rm-page-btn" (click)="goPage(currentPage+1)" [disabled]="currentPage===totalPages">›</button>
+    </div>
+  </div>
+
+</div>

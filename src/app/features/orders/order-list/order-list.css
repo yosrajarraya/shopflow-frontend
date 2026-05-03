@@ -53,3 +53,12 @@
 @media (max-width:600px){.card-header{flex-direction:column;gap:6px}.card-actions{width:100%}.btn-xs{padding:3px 6px;font-size:.7rem}.order-num-badge{font-size:.9rem}}
 
 
+
+/* ── Order products preview — compact ──────────────────────── */
+.order-products-preview { display:flex; align-items:center; gap:5px; flex-wrap:wrap; margin-bottom:4px; }
+.order-product-chip { display:inline-flex; align-items:center; gap:5px; background:rgba(0,0,0,0.03); border:1px solid rgba(0,0,0,0.06); border-radius:8px; padding:3px 8px 3px 3px; max-width:180px; flex-shrink:0; }
+.opc-img { width:28px; height:28px; border-radius:6px; overflow:hidden; background:#fff; display:flex; align-items:center; justify-content:center; flex-shrink:0; font-size:.85rem; border:1px solid rgba(0,0,0,0.06); }
+.opc-img img { width:100%; height:100%; object-fit:cover; display:block; }
+.opc-name { font-size:.75rem; font-weight:600; color:var(--text-primary); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; max-width:90px; }
+.opc-qty { font-size:.72rem; font-weight:700; color:var(--accent); white-space:nowrap; flex-shrink:0; background:rgba(79,70,229,0.08); padding:1px 5px; border-radius:4px; }
+.opc-more { font-size:.72rem; font-weight:700; color:var(--text-muted); background:rgba(0,0,0,0.04); border:1px solid rgba(0,0,0,0.06); border-radius:6px; padding:2px 7px; white-space:nowrap; flex-shrink:0; }
