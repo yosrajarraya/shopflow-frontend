@@ -1,11 +1,7 @@
-import { ApplicationConfig } from '@angular/core';
-import { provideRouter, Routes } from '@angular/router';
-import { provideAnimations } from '@angular/platform-browser/animations';
-import { provideHttpClient, withInterceptors } from '@angular/common/http';
+import { NgModule } from '@angular/core';
+import { RouterModule, Routes } from '@angular/router';
 import { authGuard } from 'src/guards/auth.guard';
-import { jwtInterceptorFn } from 'src/interceptors/jwt.interceptor';
 
-// Components
 import { HomeComponent } from './features/home/home.component';
 import { LoginComponent } from './features/auth/login/login.component';
 import { RegisterComponent } from './features/auth/register/register.component';
@@ -29,6 +25,7 @@ import { UserManagementComponent } from './features/admin/users/user-management.
 import { ReviewModerationComponent } from './features/admin/reviews/review-moderation.component';
 import { CouponManagementComponent } from './features/admin/coupons/coupon-management.component';
 
+// l'ordre intervient dans la résolution des routes
 const routes: Routes = [
   { path: '', component: HomeComponent, pathMatch: 'full' },
   { path: 'auth/login', component: LoginComponent, pathMatch: 'full' },
@@ -56,12 +53,8 @@ const routes: Routes = [
   { path: '**', redirectTo: '', pathMatch: 'full' }
 ];
 
-export const appConfig: ApplicationConfig = {
-  providers: [
-    provideRouter(routes),
-    provideAnimations(),
-    provideHttpClient(
-      withInterceptors([jwtInterceptorFn])
-    ),
-  ]
-};
+@NgModule({
+  imports: [RouterModule.forRoot(routes)],
+  exports: [RouterModule]
+})
+export class AppRoutingModule { }

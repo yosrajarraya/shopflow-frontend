@@ -1,4 +1,4 @@
 export const environment = {
-  production: false,
+  production: true,
   apiUrl: 'https://shopflow-production-18f3.up.railway.app/api'
 };

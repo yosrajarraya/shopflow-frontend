@@ -1,0 +1,153 @@
+<div class="container">
+<br>
+  <a [routerLink]="backToOrdersLink" class="back-to-dashboard">← Retour aux commandes</a>
+  <app-loading-spinner *ngIf="loading"></app-loading-spinner>
+  <div *ngIf="!loading && order" class="order-detail animate-fade">
+    <!-- Header -->
+<br>
+
+    <div class="order-header">
+      <div class="header-left">
+        <h1>{{ order.numeroCommande }}</h1>
+        <span class="badge" [ngClass]="statusClass(order.statut)">{{ statusLabel(order.statut) }}</span>
+        <p class="date-text">Passée le {{ order.dateCommande | date:'dd MMMM yyyy à HH:mm' }}</p>
+      </div>
+      <div class="header-right">
+        <div class="total-block">
+          <span class="label">Total TTC</span>
+          <span class="amount">{{ order.totalTTC | number:'1.2-2' }} TND</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Progress Tracker -->
+    <div class="progress-tracker" *ngIf="order.statut !== 'CANCELLED'">
+      <div *ngFor="let step of steps; let last = last" class="tracker-item">
+        <div class="tracker-dot" [class.done]="step.done" [class.current]="step.status === order.statut">
+          <svg *ngIf="step.done && step.status !== order.statut" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M20 6 9 17l-5-5"/></svg>
+          <span *ngIf="step.status === order.statut">●</span>
+        </div>
+        <span class="tracker-label" [class.active]="step.status === order.statut" [class.done-label]="step.done && step.status !== order.statut">{{ step.label }}</span>
+        <div *ngIf="!last" class="tracker-line" [class.done]="step.done"></div>
+      </div>
+    </div>
+
+    <!-- Main Content Grid -->
+    <div class="detail-grid">
+      <!-- Items Section -->
+      <div class="items-section">
+        <h3 class="section-title">Articles commandés</h3>
+        <div class="products-grid">
+          <div *ngFor="let ligne of order.lignes" class="product-card">
+            <!-- Image -->
+            <div class="card-image">
+              <img *ngIf="ligne.productImage" [src]="ligne.productImage" [alt]="ligne.productNom" />
+              <div *ngIf="!ligne.productImage" class="image-placeholder">📦</div>
+            </div>
+
+            <!-- Product Info -->
+            <div class="card-content">
+              <h4 class="product-name">
+                <a [routerLink]="'/products/'+ligne.productId">{{ ligne.productNom }}</a>
+              </h4>
+              <p *ngIf="ligne.variantInfo" class="variant-text">{{ ligne.variantInfo }}</p>
+
+              <!-- Price & Qty -->
+              <div class="price-qty">
+                <div class="price-info">
+                  <span class="unit-price">{{ ligne.prixUnitaire | number:'1.2-2' }} TND</span>
+                  <span class="qty-badge">× {{ ligne.quantite }}</span>
+                </div>
+                <span class="subtotal">{{ ligne.sousTotal | number:'1.2-2' }} TND</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Reviews Section -->
+        <div class="reviews-container" *ngIf="canReview() && authService.isCustomer()">
+          <h3 class="section-title mt-5">Laisser un avis</h3>
+          <div class="reviews-form-group">
+            <div *ngFor="let ligne of order.lignes" class="review-form-wrapper">
+              <div class="review-header">
+                <img *ngIf="ligne.productImage" [src]="ligne.productImage" class="review-img" />
+                <h4>{{ ligne.productNom }}</h4>
+              </div>
+
+              <div *ngIf="hasSubmittedReview(ligne.id)" class="review-success-msg">
+                ✓ Votre avis a été envoyé avec succès et sera affiché après modération.
+              </div>
+
+              <form *ngIf="!hasSubmittedReview(ligne.id) && getForm(ligne.id)"
+                    [formGroup]="getForm(ligne.id)!"
+                    (ngSubmit)="submitReview(ligne.id, ligne.productId)"
+                    class="review-form">
+
+                <!-- Star Rating -->
+                <div class="form-group">
+                  <label>Note</label>
+                  <div class="star-selector">
+                    <button *ngFor="let i of [1,2,3,4,5]"
+                            type="button"
+                            class="star-btn"
+                            [class.selected]="getForm(ligne.id)?.get('note')?.value >= i"
+                            (click)="setReviewNote(ligne.id, i)">
+                      ★
+                    </button>
+                  </div>
+                  <span class="note-display">{{ getForm(ligne.id)?.get('note')?.value || 0 }}/5</span>
+                </div>
+
+                <!-- Comment -->
+                <div class="form-group">
+                  <label for="commentaire-{{ ligne.id }}">Votre commentaire (min. 10 caractères)</label>
+                  <textarea
+                    [id]="'commentaire-' + ligne.id"
+                    formControlName="commentaire"
+                    placeholder="Décrivez votre expérience avec ce produit..."
+                    rows="3"
+                    [class.error]="getForm(ligne.id)?.get('commentaire')?.invalid && getForm(ligne.id)?.get('commentaire')?.touched">
+                  </textarea>
+                  <span class="error-text" *ngIf="getForm(ligne.id)?.get('commentaire')?.invalid && getForm(ligne.id)?.get('commentaire')?.touched">
+                    Le commentaire doit faire au moins 10 caractères
+                  </span>
+                </div>
+
+                <!-- Submit -->
+                <button type="submit"
+                        class="btn btn-primary btn-sm"
+                        [disabled]="getForm(ligne.id)?.invalid || isSubmitting(ligne.id)">
+                  {{ isSubmitting(ligne.id) ? '⏳ Envoi...' : '✓ Envoyer votre avis' }}
+                </button>
+              </form>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Sidebar -->
+      <aside class="detail-sidebar">
+        <div class="sidebar-card">
+          <h4>Récapitulatif</h4>
+          <div class="divider mt-2 mb-3"></div>
+          <div class="totals-list">
+            <div class="total-row"><span>Sous-total</span><span>{{ order.sousTotal | number:'1.2-2' }} TND</span></div>
+            <div class="total-row"><span>Livraison</span><span>{{ order.fraisLivraison | number:'1.2-2' }} TND</span></div>
+            <div class="divider"></div>
+            <div class="total-row final">
+              <span>Total TTC</span>
+              <span class="text-accent">{{ order.totalTTC | number:'1.2-2' }} TND</span>
+            </div>
+          </div>
+        </div>
+        <div class="sidebar-card">
+          <h4>Livraison</h4>
+          <div class="divider mt-2 mb-3"></div>
+          <p class="text-secondary" style="font-size:.9rem;line-height:1.6">{{ order.adresseLivraison }}</p>
+          <div class="divider mt-3 mb-2"></div>
+          <p class="text-muted" style="font-size:.82rem">Client : <span class="text-secondary">{{ order.customerNom }}</span></p>
+        </div>
+      </aside>
+    </div>
+  </div>
+</div>
